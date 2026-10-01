@@ -1,4 +1,4 @@
-name: Build WinGo Tracker APK
+Name: Build WinGo Tracker APK
 
 on:
   workflow_dispatch:
@@ -21,17 +21,16 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Install Android SDK
-        uses: android-actions/setup-android@v3
-
       - name: Install SDK packages
-        run: sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+        run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
       - name: Extract Android project
         run: |
           mkdir -p source
           unzip -o WinGoTrackerAndroid_source.zip -d source
-          PROJECT_DIR=$(find source -name settings.gradle.kts -printf '%h\n' | head -n 1)
+          PROJECT_DIR=$(find source -name settings.gradle.kts -o -name settings.gradle | head -n 1 | xargs dirname)
           if [ -z "$PROJECT_DIR" ]; then
             echo "Android project not found"
             find source -maxdepth 4 -type f
