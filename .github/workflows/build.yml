@@ -1,0 +1,37 @@
+steps:
+  - name: Checkout repository
+    uses: actions/checkout@v4
+
+  - name: Set up Java
+    uses: actions/setup-java@v4
+    with:
+      distribution: temurin
+      java-version: '17'
+
+  - name: Install Android SDK
+    uses: android-actions/setup-android@v3
+
+  - name: Install SDK packages
+    run: sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+
+  - name: Extract Android project
+    run: |
+      unzip WinGoTrackerAndroid_source.zip -d source
+      ls -la source/WinGoTrackerAndroid
+
+  - name: Install Gradle
+    run: |
+      wget https://services.gradle.org/distributions/gradle-8.9-bin.zip
+      unzip -q gradle-8.9-bin.zip -d "$RUNNER_TEMP"
+      echo "$RUNNER_TEMP/gradle-8.9/bin" >> "$GITHUB_PATH"
+
+  - name: Build debug APK
+    working-directory: source/WinGoTrackerAndroid
+    run: gradle assembleDebug --no-daemon
+
+  - name: Upload APK
+    uses: actions/upload-artifact@v4
+    with:
+      name: WinGo-Tracker-APK
+      path: source/WinGoTrackerAndroid/app/build/outputs/apk/debug/app-debug.apk
+      if-no-files-found: error
