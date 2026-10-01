@@ -1,4 +1,4 @@
-Name: Build WinGo Tracker APK
+name: Build WinGo Tracker APK
 
 on:
   workflow_dispatch:
